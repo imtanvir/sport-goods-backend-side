@@ -17,4 +17,6 @@ router.post(
   ProductController.CreateProduct
 );
 
+router.get("/get-products", ProductController.GetAllProduct);
+router.delete("/delete-product/:id", ProductController.DeleteProduct);
 export const ProductRouter = router;

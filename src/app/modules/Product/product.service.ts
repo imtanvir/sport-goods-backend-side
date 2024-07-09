@@ -34,4 +34,14 @@ const createProduct = async (files: any[], productData: TProduct) => {
   }
 };
 
-export const ProductService = { createProduct };
+const getAllProducts = async () => {
+  const result = await Product.find({});
+
+  return result;
+};
+
+const deleteProduct = async (productId: string) => {
+  const result = await Product.findByIdAndDelete({ _id: productId });
+  return result;
+};
+export const ProductService = { createProduct, getAllProducts, deleteProduct };
