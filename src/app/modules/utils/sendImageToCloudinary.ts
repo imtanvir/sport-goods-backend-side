@@ -35,6 +35,20 @@ export const sendImageToCloudinary = (
   });
 };
 
+export const deleteImageFromCloudinary = (
+  imageName: string
+): Promise<Record<string, unknown>> => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.destroy(imageName.trim(), function (error, result) {
+      if (error) {
+        reject(error);
+      }
+      console.log({ result });
+      resolve(result);
+    });
+  });
+};
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, process.cwd() + "/uploads/");

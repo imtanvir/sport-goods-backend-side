@@ -19,4 +19,14 @@ router.post(
 
 router.get("/get-products", ProductController.GetAllProduct);
 router.delete("/delete-product/:id", ProductController.DeleteProduct);
+router.put(
+  "/update-product/:id",
+  upload.array("file", 5),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+  validationChecker(productValidation.updateProductValidation),
+  ProductController.UpdateProduct
+);
 export const ProductRouter = router;

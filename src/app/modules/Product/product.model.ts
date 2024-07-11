@@ -5,7 +5,16 @@ const productSchema = new Schema<TProduct>({
   name: { type: String, required: true },
   description: { type: String, required: true },
   price: { type: Number, required: true },
-  image: { type: [String], default: [] },
+  image: {
+    type: [
+      {
+        _id: false,
+        id: { type: String, required: true },
+        url: { type: String, required: true },
+      },
+    ],
+    default: [],
+  },
   category: { type: String, required: true },
   quantity: { type: Number, required: true },
   brand: { type: String, required: true },

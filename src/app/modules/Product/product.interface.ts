@@ -1,8 +1,13 @@
+export type TImage = {
+  id: string;
+  url: string;
+};
+
 export type TProduct = {
   name: string;
   description: string;
   price: number;
-  image?: string[];
+  image?: TImage[];
   category: string;
   quantity: number;
   brand: string;

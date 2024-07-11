@@ -8,7 +8,11 @@ const CreateProduct = catchAsync(async (req, res) => {
   if (!req.files) {
     throw new Error("No files provided");
   }
-  const result = await ProductService.createProduct(req.files, productData);
+
+  const result = await ProductService.createProduct(
+    req?.files as Express.Multer.File[],
+    productData
+  );
 
   sendResponse(res, {
     statusCode: 200,
@@ -42,8 +46,30 @@ const DeleteProduct = catchAsync(async (req, res) => {
   });
 });
 
+const UpdateProduct = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const selectedImgToDelete = req.params?.imageId ?? null;
+  const productData = req.body;
+  const imageFiles =
+    Array.isArray(req?.files) && req.files !== undefined ? req.files : [];
+  const result = await ProductService.updateProduct(
+    id,
+    // selectedImgToDelete,
+    imageFiles,
+    productData
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Product updated successfully",
+    data: result,
+  });
+});
+
 export const ProductController = {
   CreateProduct,
   GetAllProduct,
   DeleteProduct,
+  UpdateProduct,
 };
