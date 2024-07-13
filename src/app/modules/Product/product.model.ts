@@ -16,7 +16,7 @@ const productSchema = new Schema<TProduct>({
     default: [],
   },
   category: { type: String, required: true },
-  quantity: { type: Number, required: true },
+  stock_quantity: { type: Number, required: true },
   brand: { type: String, required: true },
   rating: { type: Number, required: true },
 });

@@ -1,9 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { SortOrder } from "mongoose";
+import { feedbackMailSend } from "../utils/feedbackMailSend";
 import {
   deleteImageFromCloudinary,
   sendImageToCloudinary,
 } from "../utils/sendImageToCloudinary";
-import { TImage, TProduct } from "./product.interface";
+import { TFeedback, TImage, TProduct } from "./product.interface";
 import { Product } from "./product.model";
 
 const createProduct = async (
@@ -17,10 +18,12 @@ const createProduct = async (
       const images: TImage[] = [];
       for (const file of files) {
         const imageName = `${Math.floor(Math.random() * 9000) + 100000}`;
-        const path = file?.path;
 
-        //send image to cloudinary
-        const { secure_url } = await sendImageToCloudinary(imageName, path);
+        // send image to Cloudinary using buffer
+        const { secure_url } = await sendImageToCloudinary(
+          imageName,
+          file.buffer
+        );
         images.push({ id: imageName, url: secure_url as string });
       }
       productData.image = images;
@@ -38,8 +41,51 @@ const createProduct = async (
   }
 };
 
-const getAllProducts = async () => {
-  const result = await Product.find({});
+const getAllProducts = async (
+  sortOrder: string,
+  searchQuery: string,
+  priceMin: string,
+  priceMax: string,
+  brand: string,
+  category: string,
+  rating: string
+) => {
+  let query: any = {};
+
+  // search query
+  if (searchQuery) {
+    query.name = { $regex: new RegExp(searchQuery, "i") };
+  }
+
+  // Filter base on price range
+  if (priceMin && priceMax) {
+    query.price = {
+      $gte: parseInt(priceMin),
+      $lte: parseInt(priceMax),
+    };
+  } else if (priceMin) {
+    query.price = { $gte: parseInt(priceMin) };
+  } else if (priceMax) {
+    query.price = { $lte: parseInt(priceMax) };
+  }
+
+  // Filter base on brand
+  if (brand) {
+    query.brand = { $eq: brand };
+  }
+  if (category) {
+    query.category = { $eq: category };
+  }
+  if (rating) {
+    query.rating = { $gte: parseInt(rating) };
+  }
+
+  // sort base on price
+  const sortOptions: { [key: string]: SortOrder } = {
+    price: sortOrder === "desc" ? -1 : 1,
+  };
+
+  const result = await Product.find(query).sort(sortOptions);
 
   return result;
 };
@@ -92,10 +138,12 @@ const updateProduct = async (
     if (files.length > 0) {
       for (const file of files) {
         const imageName = `${Math.floor(Math.random() * 9000) + 100000}`;
-        const path = file?.path;
 
-        //send image to cloudinary
-        const { secure_url } = await sendImageToCloudinary(imageName, path);
+        // send image to Cloudinary using buffer
+        const { secure_url } = await sendImageToCloudinary(
+          imageName,
+          file.buffer
+        );
         images.push({ id: imageName, url: secure_url as string });
       }
 
@@ -123,9 +171,14 @@ const updateProduct = async (
     throw new Error(error);
   }
 };
+
+const sendFeedback = async (feedbackData: TFeedback) => {
+  feedbackMailSend(feedbackData.email, feedbackData.message);
+};
 export const ProductService = {
   createProduct,
   getAllProducts,
   deleteProduct,
   updateProduct,
+  sendFeedback,
 };

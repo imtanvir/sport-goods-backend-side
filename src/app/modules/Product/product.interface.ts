@@ -9,7 +9,11 @@ export type TProduct = {
   price: number;
   image?: TImage[];
   category: string;
-  quantity: number;
+  stock_quantity: number;
   brand: string;
   rating: number;
+};
+export type TFeedback = {
+  email: string;
+  message: string;
 };

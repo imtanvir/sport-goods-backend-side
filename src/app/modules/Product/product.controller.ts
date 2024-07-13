@@ -23,7 +23,26 @@ const CreateProduct = catchAsync(async (req, res) => {
 });
 
 const GetAllProduct = catchAsync(async (req, res) => {
-  const result = await ProductService.getAllProducts();
+  const {
+    sortOrder,
+    searchQuery,
+    priceMin,
+    priceMax,
+    brand,
+    category,
+    rating,
+  } = req.query;
+  const sortOrderString = typeof sortOrder === "string" ? sortOrder : "asc";
+
+  const result = await ProductService.getAllProducts(
+    sortOrderString,
+    searchQuery as string,
+    priceMin as string,
+    priceMax as string,
+    brand as string,
+    category as string,
+    rating as string
+  );
 
   sendResponse(res, {
     statusCode: 200,
@@ -67,9 +86,21 @@ const UpdateProduct = catchAsync(async (req, res) => {
   });
 });
 
+const SendFeedback = catchAsync(async (req, res) => {
+  const feedback = req.body;
+  const result = await ProductService.sendFeedback(feedback);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Send feedback successfully",
+    data: null,
+  });
+});
 export const ProductController = {
   CreateProduct,
   GetAllProduct,
   DeleteProduct,
   UpdateProduct,
+  SendFeedback,
 };
