@@ -21,7 +21,8 @@ router.post("/create-product", sendImageToCloudinary_1.upload.array("file", 5), 
 }, (0, validationChecker_1.default)(product_validation_1.productValidation.productCreateValidation), product_controller_1.ProductController.CreateProduct);
 router.get("/get-products", product_controller_1.ProductController.GetAllProduct);
 router.delete("/delete-product/:id", product_controller_1.ProductController.DeleteProduct);
-router.put("/update-product/:id", sendImageToCloudinary_1.upload.array("file", 5), (req, res, next) => {
+router.post("/update-product-quantity", product_controller_1.ProductController.UpdateProductQuantity);
+router.put("/:id", sendImageToCloudinary_1.upload.array("file", 1), (req, res, next) => {
     try {
         req.body = JSON.parse(req.body.data);
         next();
@@ -29,6 +30,7 @@ router.put("/update-product/:id", sendImageToCloudinary_1.upload.array("file", 5
     catch (error) {
         res.status(500).json({ error: error.message });
     }
-}, (0, validationChecker_1.default)(product_validation_1.productValidation.updateProductValidation), product_controller_1.ProductController.UpdateProduct);
+}, product_controller_1.ProductController.UpdateProduct);
+router.delete("/:id", product_controller_1.ProductController.DeleteProduct);
 router.post("/send-feedback", product_controller_1.ProductController.SendFeedback);
 exports.ProductRouter = router;

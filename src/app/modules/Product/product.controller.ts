@@ -23,26 +23,7 @@ const CreateProduct = catchAsync(async (req, res) => {
 });
 
 const GetAllProduct = catchAsync(async (req, res) => {
-  const {
-    sortOrder,
-    searchQuery,
-    priceMin,
-    priceMax,
-    brand,
-    category,
-    rating,
-  } = req.query;
-  const sortOrderString = typeof sortOrder === "string" ? sortOrder : "asc";
-
-  const result = await ProductService.getAllProducts(
-    sortOrderString,
-    searchQuery as string,
-    priceMin as string,
-    priceMax as string,
-    brand as string,
-    category as string,
-    rating as string
-  );
+  const result = await ProductService.getAllProducts();
 
   sendResponse(res, {
     statusCode: 200,
@@ -73,7 +54,6 @@ const UpdateProduct = catchAsync(async (req, res) => {
     Array.isArray(req?.files) && req.files !== undefined ? req.files : [];
   const result = await ProductService.updateProduct(
     id,
-    // selectedImgToDelete,
     imageFiles,
     productData
   );
@@ -82,6 +62,18 @@ const UpdateProduct = catchAsync(async (req, res) => {
     statusCode: 200,
     success: true,
     message: "Product updated successfully",
+    data: result,
+  });
+});
+
+const UpdateProductQuantity = catchAsync(async (req, res) => {
+  const { stock_quantity, id } = req.body;
+  const result = await ProductService.updateProductQuantity(id, stock_quantity);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Product quantity updated successfully",
     data: result,
   });
 });
@@ -97,10 +89,31 @@ const SendFeedback = catchAsync(async (req, res) => {
     data: null,
   });
 });
+
+const updateProduct = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const productUpdateData = req.body;
+  const imageFiles =
+    Array.isArray(req?.files) && req.files !== undefined ? req.files : [];
+
+  const result = await ProductService.updateProduct(
+    id,
+    imageFiles,
+    productUpdateData
+  );
+
+  sendResponse(res, {
+    success: true,
+    statusCode: 200,
+    message: "Bike updated successfully",
+    data: result,
+  });
+});
 export const ProductController = {
   CreateProduct,
   GetAllProduct,
   DeleteProduct,
   UpdateProduct,
   SendFeedback,
+  UpdateProductQuantity,
 };

@@ -22,14 +22,6 @@ export const sendImageToCloudinary = (
           reject(error);
         }
         resolve(result as UploadApiResponse);
-        // delete a file asynchronously
-        // fs.unlink(path, (err) => {
-        //   if (err) {
-        //     console.log(err);
-        //   } else {
-        //     console.log("File is deleted.");
-        //   }
-        // });
       }
     );
 
@@ -46,9 +38,7 @@ export const deleteImageFromCloudinary = (
     cloudinary.uploader.destroy(imageName.trim(), function (error, result) {
       if (error) {
         reject(error);
-        console.log({ error });
       }
-      console.log({ result });
       resolve(result);
     });
   });

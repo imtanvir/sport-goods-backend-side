@@ -21,14 +21,6 @@ const sendImageToCloudinary = (imageName, buffer) => {
                 reject(error);
             }
             resolve(result);
-            // delete a file asynchronously
-            // fs.unlink(path, (err) => {
-            //   if (err) {
-            //     console.log(err);
-            //   } else {
-            //     console.log("File is deleted.");
-            //   }
-            // });
         });
         // Stream the buffer to Cloudinary
         streamifier_1.default.createReadStream(buffer).pipe(uploadStream);
@@ -41,9 +33,7 @@ const deleteImageFromCloudinary = (imageName) => {
         cloudinary_1.v2.uploader.destroy(imageName.trim(), function (error, result) {
             if (error) {
                 reject(error);
-                console.log({ error });
             }
-            console.log({ result });
             resolve(result);
         });
     });

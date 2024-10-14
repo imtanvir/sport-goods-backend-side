@@ -23,9 +23,14 @@ router.post(
 
 router.get("/get-products", ProductController.GetAllProduct);
 router.delete("/delete-product/:id", ProductController.DeleteProduct);
+
+router.post(
+  "/update-product-quantity",
+  ProductController.UpdateProductQuantity
+);
 router.put(
-  "/update-product/:id",
-  upload.array("file", 5),
+  "/:id",
+  upload.array("file", 1),
   (req: Request, res: Response, next: NextFunction) => {
     try {
       req.body = JSON.parse(req.body.data);
@@ -34,9 +39,10 @@ router.put(
       res.status(500).json({ error: (error as Error).message });
     }
   },
-  validationChecker(productValidation.updateProductValidation),
   ProductController.UpdateProduct
 );
+
+router.delete("/:id", ProductController.DeleteProduct);
 
 router.post("/send-feedback", ProductController.SendFeedback);
 export const ProductRouter = router;

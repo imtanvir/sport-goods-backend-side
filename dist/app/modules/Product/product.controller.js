@@ -30,9 +30,7 @@ const CreateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     });
 }));
 const GetAllProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { sortOrder, searchQuery, priceMin, priceMax, brand, category, rating, } = req.query;
-    const sortOrderString = typeof sortOrder === "string" ? sortOrder : "asc";
-    const result = yield product_service_1.ProductService.getAllProducts(sortOrderString, searchQuery, priceMin, priceMax, brand, category, rating);
+    const result = yield product_service_1.ProductService.getAllProducts();
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
@@ -56,13 +54,21 @@ const UpdateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     const selectedImgToDelete = (_b = (_a = req.params) === null || _a === void 0 ? void 0 : _a.imageId) !== null && _b !== void 0 ? _b : null;
     const productData = req.body;
     const imageFiles = Array.isArray(req === null || req === void 0 ? void 0 : req.files) && req.files !== undefined ? req.files : [];
-    const result = yield product_service_1.ProductService.updateProduct(id, 
-    // selectedImgToDelete,
-    imageFiles, productData);
+    const result = yield product_service_1.ProductService.updateProduct(id, imageFiles, productData);
     (0, sendResponse_1.default)(res, {
         statusCode: 200,
         success: true,
         message: "Product updated successfully",
+        data: result,
+    });
+}));
+const UpdateProductQuantity = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { stock_quantity, id } = req.body;
+    const result = yield product_service_1.ProductService.updateProductQuantity(id, stock_quantity);
+    (0, sendResponse_1.default)(res, {
+        statusCode: 200,
+        success: true,
+        message: "Product quantity updated successfully",
         data: result,
     });
 }));
@@ -73,6 +79,18 @@ const SendFeedback = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
         statusCode: 200,
         success: true,
         message: "Send feedback successfully",
+        data: null,
+    });
+}));
+const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    const productUpdateData = req.body;
+    const imageFiles = Array.isArray(req === null || req === void 0 ? void 0 : req.files) && req.files !== undefined ? req.files : [];
+    const result = yield product_service_1.ProductService.updateProduct(id, imageFiles, productUpdateData);
+    (0, sendResponse_1.default)(res, {
+        success: true,
+        statusCode: 200,
+        message: "Bike updated successfully",
         data: result,
     });
 }));
@@ -82,4 +100,5 @@ exports.ProductController = {
     DeleteProduct,
     UpdateProduct,
     SendFeedback,
+    UpdateProductQuantity,
 };

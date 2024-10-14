@@ -8,6 +8,7 @@ let server: Server;
 async function main() {
   try {
     await mongoose.connect(config.database_url as string);
+    // await mongoose.connect("mongodb://localhost:27017/");
 
     server = app.listen(config.port, () => {
       console.log(`Sport Goods Backend running on port ${config.port}`);

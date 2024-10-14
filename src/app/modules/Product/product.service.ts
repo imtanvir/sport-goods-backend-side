@@ -1,4 +1,4 @@
-import mongoose, { SortOrder } from "mongoose";
+import mongoose from "mongoose";
 import { feedbackMailSend } from "../utils/feedbackMailSend";
 import {
   deleteImageFromCloudinary,
@@ -29,7 +29,6 @@ const createProduct = async (
       productData.image = images;
     }
     const product = await Product.create([productData], { session });
-
     await session.commitTransaction();
     await session.endSession();
 
@@ -41,51 +40,10 @@ const createProduct = async (
   }
 };
 
-const getAllProducts = async (
-  sortOrder: string,
-  searchQuery: string,
-  priceMin: string,
-  priceMax: string,
-  brand: string,
-  category: string,
-  rating: string
-) => {
-  let query: any = {};
-
-  // search query
-  if (searchQuery) {
-    query.name = { $regex: new RegExp(searchQuery, "i") };
-  }
-
-  // Filter base on price range
-  if (priceMin && priceMax) {
-    query.price = {
-      $gte: parseInt(priceMin),
-      $lte: parseInt(priceMax),
-    };
-  } else if (priceMin) {
-    query.price = { $gte: parseInt(priceMin) };
-  } else if (priceMax) {
-    query.price = { $lte: parseInt(priceMax) };
-  }
-
-  // Filter base on brand
-  if (brand) {
-    query.brand = { $eq: brand };
-  }
-  if (category) {
-    query.category = { $eq: category };
-  }
-  if (rating) {
-    query.rating = { $gte: parseInt(rating) };
-  }
-
-  // sort base on price
-  const sortOptions: { [key: string]: SortOrder } = {
-    price: sortOrder === "desc" ? -1 : 1,
-  };
-
-  const result = await Product.find(query).sort(sortOptions);
+const getAllProducts = async () => {
+  const result = await Product.find({}).sort({
+    createdAt: 1,
+  });
 
   return result;
 };
@@ -117,22 +75,10 @@ const updateProduct = async (
       productData.image !== undefined &&
       product?.image?.length > productData?.image?.length
     ) {
-      // Check those images which remove from front end
-      const removedImages = product.image.filter(
-        (productImg) =>
-          !productData.image!.some(
-            (productDataImg) => productDataImg.id === productImg.id
-          )
-      );
-      console.log({ removedImages });
-      // delete front end deleted images from cloud
-      for (const img of removedImages) {
+      for (const img of productData.image) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
         const removeFromCloud = await deleteImageFromCloudinary(img.id);
-        console.log(removeFromCloud);
       }
-
-      productData.image = [...productData?.image];
-      console.log({ pdimg: productData.image });
     }
 
     if (files.length > 0) {
@@ -144,11 +90,13 @@ const updateProduct = async (
           imageName,
           file.buffer
         );
-        images.push({ id: imageName, url: secure_url as string });
+        images.push({
+          id: imageName,
+          url: secure_url as string,
+        });
       }
 
-      // update product image data with update product image info
-      productData.image = [...(productData?.image ?? []), ...images];
+      productData.image = [...images];
     }
 
     // update images to db
@@ -158,6 +106,7 @@ const updateProduct = async (
       {
         new: true,
         runValidators: true,
+        session,
       }
     );
 
@@ -172,6 +121,15 @@ const updateProduct = async (
   }
 };
 
+const updateProductQuantity = async (_id: string, stock_quantity: number) => {
+  const result = await Product.findByIdAndUpdate(
+    { _id },
+    { stock_quantity },
+    { new: true }
+  );
+  return result;
+};
+
 const sendFeedback = async (feedbackData: TFeedback) => {
   feedbackMailSend(feedbackData.email, feedbackData.message);
 };
@@ -181,4 +139,5 @@ export const ProductService = {
   deleteProduct,
   updateProduct,
   sendFeedback,
+  updateProductQuantity,
 };
